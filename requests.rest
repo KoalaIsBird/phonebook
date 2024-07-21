@@ -1,0 +1,18 @@
+### Delete a person
+DELETE http://localhost:3001/api/persons/3
+
+
+### Get all notes
+GET http://localhost:3001/api/persons/
+
+
+
+### Post a note
+POST http://localhost:3001/api/persons/
+Content-Type: application/json
+
+
+{
+    "name": "andrew",
+    "number": "0618"
+}

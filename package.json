@@ -1,0 +1,21 @@
+{
+  "name": "phonebook",
+  "version": "1.0.0",
+  "description": "phonebook exercise",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"no test command yet\"",
+    "dev": "nodemon index.js",
+    "build:ui": "rm -rf dist && cd ../../part2/phonebook && npm run build && cp -r dist ../../part3/phonebook"
+  },
+  "author": "KoalaIsBird",
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "morgan": "^1.10.0"
+  }
+}
