@@ -16,3 +16,24 @@ Content-Type: application/json
     "name": "andrew",
     "number": "0618"
 }
+
+
+
+### Delete a person
+DELETE https://phonebook-6cqa.onrender.com/api/persons/1
+
+
+### Get all notes
+GET https://phonebook-6cqa.onrender.com/api/persons/
+
+
+
+### Post a note
+POST https://phonebook-6cqa.onrender.com/api/persons/
+Content-Type: application/json
+
+
+{
+    "name": "andrew",
+    "number": "0618"
+}
