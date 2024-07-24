@@ -1,5 +1,5 @@
 ### Delete a person
-DELETE http://localhost:3001/api/persons/3
+DELETE http://localhost:3001/api/persons/669d3c803979a2155c942c57
 
 
 ### Get all notes
@@ -13,7 +13,7 @@ Content-Type: application/json
 
 
 {
-    "name": "andrew",
+    "name": "andreweee",
     "number": "0618"
 }
 

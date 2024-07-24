@@ -1,3 +1,5 @@
+require('dotenv').config()
+const Person = require('./models/person')
 const express = require('express')
 const morgan = require('morgan')
 const app = express()
@@ -9,8 +11,8 @@ app.use(express.json())
 morgan.token('data', (request, response) => {
     return JSON.stringify(request.body)
 })
-
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :data'))
+
 
 let data = [
     {
@@ -37,7 +39,9 @@ let data = [
 
 
 app.get('/api/persons', (request, response) => {
-    response.json(data)
+    Person.find({}, { _id: 0, __v: 0 }).then(persons => {
+        response.json(persons)
+    })
 })
 
 
@@ -75,21 +79,23 @@ app.post('/api/persons', (request, response) => {
     const body = request.body
 
     if (!body.name || !body.number) {
-        return response.status(400).json({error: 'name or number is missing'})
+        return response.status(400).json({ error: 'name or number is missing' })
     }
-    
-    if (data.find(note => note.name === body.name)) {
-        return response.status(400).json({error: 'name is already in the phonebook'})
-    }
-    
-    const note = {
-        id: String(Math.floor(Math.random() * 100000000)),
-        name: body.name,
-        number: body.number
-    }
-    
-    data.push(note)
-    response.json(note)
+
+    Person.find({name: body.name}).then(personsWithSameName => {
+        if (personsWithSameName.length !== 0) {
+            return response.status(400).json({ error: 'name is already in the phonebook' })
+        }
+
+        const person = new Person({
+            name: body.name,
+            number: body.number
+        })
+
+        person.save().then(savedPerson => {
+            response.json(savedPerson)
+        })
+    })
 })
 
 const PORT = 3001
