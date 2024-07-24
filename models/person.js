@@ -9,6 +9,4 @@ const personSchema = mongoose.Schema({
 
 const Person = mongoose.model('Person', personSchema)
 
-//personSchema.set('toJSON', ())
-
 module.exports = Person

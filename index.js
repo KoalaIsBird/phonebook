@@ -1,80 +1,55 @@
 require('dotenv').config()
 const Person = require('./models/person')
 const express = require('express')
+const { Schema } = require('mongoose')
 const morgan = require('morgan')
 const app = express()
 
 
+// middleware
 app.use(express.static('dist'))
 app.use(express.json())
-
 morgan.token('data', (request, response) => {
     return JSON.stringify(request.body)
 })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :data'))
 
 
-let data = [
-    {
-        "id": "1",
-        "name": "Arto Hellas",
-        "number": "040-123456"
-    },
-    {
-        "id": "2",
-        "name": "Ada Lovelace",
-        "number": "39-44-5323523"
-    },
-    {
-        "id": "3",
-        "name": "Dan Abramov",
-        "number": "12-43-234345"
-    },
-    {
-        "id": "4",
-        "name": "Mary Poppendieck",
-        "number": "39-23-6423122"
-    }
-]
-
-
+// get notes
 app.get('/api/persons', (request, response) => {
-    Person.find({}, { _id: 0, __v: 0 }).then(persons => {
+    Person.find({}, { __v: 0 }).then(persons => {
         response.json(persons)
     })
 })
 
-
+// get info about notes
 app.get('/info', (request, response) => {
-    response.send(`<p>Phonebook has info for ${data.length} people <br>${Date()}</p>`)
+    Person.find({}).then(persons => {
+        response.send(`<p>Phonebook has info for ${persons.length} people <br>${Date()}</p>`)
+    })
 })
 
-
-app.get('/api/persons/:id', (request, response) => {
-    const id = request.params.id
-    const note = data.find(note => note.id === id)
-
-    if (note) {
-        return response.json(note)
-    }
-
-    response.status(404).end()
+// get a person
+app.get('/api/persons/:id', (request, response, next) => {
+    Person.findById(request.params.id)
+        .then(person => {
+            if (person) {
+                response.send(person)
+            } else {
+                response.status(404).end()
+            }
+        })
+        .catch(error => next(error))
 })
 
-
-app.delete('/api/persons/:id', (request, response) => {
-    const id = request.params.id
-    const note = data.find(note => note.id === id)
-
-    if (note) {
-        data = data.filter(note => note.id !== id)
-        return response.status(204).end()
-    }
-
-    response.status(404).end()
+// delete note
+app.delete('/api/persons/:id', (request, response, next) => {
+    Person.findByIdAndDelete(request.params.id)
+        .then(result => response.status(204).end())
+        .catch(error => next(error))
 })
 
-
+// add note
 app.post('/api/persons', (request, response) => {
     const body = request.body
 
@@ -82,23 +57,58 @@ app.post('/api/persons', (request, response) => {
         return response.status(400).json({ error: 'name or number is missing' })
     }
 
-    Person.find({name: body.name}).then(personsWithSameName => {
-        if (personsWithSameName.length !== 0) {
-            return response.status(400).json({ error: 'name is already in the phonebook' })
-        }
+    Person.find({ name: body.name })
+        .then(personsWithSameName => {
+            if (personsWithSameName.length !== 0) {
+                return response.status(400).json({ error: 'name is already in the phonebook' })
+            }
 
-        const person = new Person({
-            name: body.name,
-            number: body.number
-        })
+            const person = new Person({
+                name: body.name,
+                number: body.number
+            })
 
-        person.save().then(savedPerson => {
-            response.json(savedPerson)
+            person.save().then(savedPerson => {
+                response.json(savedPerson)
+            })
         })
-    })
 })
 
-const PORT = 3001
+// change note
+app.put('/api/persons/:id', (request, response, next) => {
+    const person = {
+        number: request.body.number
+    }
+
+    Person.findByIdAndUpdate(request.params.id, person, { new: true })
+        .then(updatedPerson => {
+            if (updatedPerson) {
+                response.send(updatedPerson)
+            } else {
+                response.status(404).end()
+            }
+        })
+        .catch(error => next(error))
+})
+
+
+// more middleware
+const unknownRoute = (request, response, next) => {
+    response.status(404).send({ error: 'unknown url' })
+}
+app.use(unknownRoute)
+
+const handleError = (error, request, response, next) => {
+    console.log(error)
+    if (error.name === 'CastError') {
+        response.status(400).send({ error: 'badly formatted id' })
+    }
+}
+app.use(handleError)
+
+
+// make app listen to port
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
     console.log("Server runs on port", PORT)
 })
