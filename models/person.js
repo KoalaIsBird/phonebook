@@ -3,10 +3,12 @@ const mongoose = require('mongoose')
 mongoose.connect(process.env.MONGODB_URI)
 
 
-const phoneNumberValidator = [(phoneNumber) => {
-    return /^\d{2,3}-\d+$/.test(phoneNumber)
-},
-    'phone number is not valid, must have two or three digits, then a dash, then digits']
+const phoneNumberValidator = [
+    (phoneNumber) => {
+        return /^\d{2,3}-\d+$/.test(phoneNumber)
+    },
+    'phone number is not valid, must have two or three digits, then a dash, then digits'
+]
 
 const personSchema = mongoose.Schema({
     name: {

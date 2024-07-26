@@ -7,11 +7,16 @@
     "start": "node index.js",
     "test": "echo \"no test command yet\"",
     "dev": "nodemon index.js",
-    "build:ui": "rm -rf dist && cd ../../part2/phonebook && npm run build && cp -r dist ../../part3/phonebook"
+    "build:ui": "rm -rf dist && cd ../../part2/phonebook && npm run build && cp -r dist ../../part3/phonebook",
+    "lint": "eslint ."
   },
   "author": "KoalaIsBird",
   "license": "MIT",
   "devDependencies": {
+    "@eslint/js": "^9.7.0",
+    "@stylistic/eslint-plugin-js": "^2.3.0",
+    "eslint": "^9.7.0",
+    "globals": "^15.8.0",
     "nodemon": "^3.1.4"
   },
   "dependencies": {

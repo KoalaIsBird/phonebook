@@ -1,7 +1,6 @@
 require('dotenv').config()
 const Person = require('./models/person')
 const express = require('express')
-const { Schema } = require('mongoose')
 const morgan = require('morgan')
 const app = express()
 
@@ -9,7 +8,7 @@ const app = express()
 // middleware
 app.use(express.static('dist'))
 app.use(express.json())
-morgan.token('data', (request, response) => {
+morgan.token('data', (request) => {
     return JSON.stringify(request.body)
 })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :data'))
@@ -45,7 +44,7 @@ app.get('/api/persons/:id', (request, response, next) => {
 // delete person
 app.delete('/api/persons/:id', (request, response, next) => {
     Person.findByIdAndDelete(request.params.id)
-        .then(result => response.status(204).end())
+        .then(() => response.status(204).end())
         .catch(error => next(error))
 })
 
@@ -96,7 +95,7 @@ app.put('/api/persons/:id', (request, response, next) => {
 
 
 // more middleware
-const unknownRoute = (request, response, next) => {
+const unknownRoute = (request, response) => {
     response.status(404).send({ error: 'unknown url' })
 }
 app.use(unknownRoute)
@@ -118,5 +117,5 @@ app.use(handleError)
 // make app listen to port
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
-    console.log("Server runs on port", PORT)
+    console.log('Server runs on port', PORT)
 })
