@@ -42,15 +42,15 @@ app.get('/api/persons/:id', (request, response, next) => {
         .catch(error => next(error))
 })
 
-// delete note
+// delete person
 app.delete('/api/persons/:id', (request, response, next) => {
     Person.findByIdAndDelete(request.params.id)
         .then(result => response.status(204).end())
         .catch(error => next(error))
 })
 
-// add note
-app.post('/api/persons', (request, response) => {
+// add person
+app.post('/api/persons', (request, response, next) => {
     const body = request.body
 
     if (!body.name || !body.number) {
@@ -68,19 +68,22 @@ app.post('/api/persons', (request, response) => {
                 number: body.number
             })
 
-            person.save().then(savedPerson => {
-                response.json(savedPerson)
-            })
+            person.save()
+                .then(savedPerson => {
+                    response.json(savedPerson)
+                })
+                .catch(error => next(error))
         })
 })
 
-// change note
+// change person
 app.put('/api/persons/:id', (request, response, next) => {
     const person = {
+        name: request.body.name,
         number: request.body.number
     }
 
-    Person.findByIdAndUpdate(request.params.id, person, { new: true })
+    Person.findByIdAndUpdate(request.params.id, person, { new: true, runValidators: true })
         .then(updatedPerson => {
             if (updatedPerson) {
                 response.send(updatedPerson)
@@ -101,8 +104,13 @@ app.use(unknownRoute)
 const handleError = (error, request, response, next) => {
     console.log(error)
     if (error.name === 'CastError') {
-        response.status(400).send({ error: 'badly formatted id' })
+        return response.status(400).send({ error: 'badly formatted id' })
     }
+    if (error.name === 'ValidationError') {
+        return response.status(400).send({ error: error.message })
+    }
+
+    next(error)
 }
 app.use(handleError)
 

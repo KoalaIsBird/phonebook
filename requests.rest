@@ -13,16 +13,17 @@ Content-Type: application/json
 
 
 {
-    "name": "jospehinee",
-    "number": "0618"
+    "name": "joeeeeeee",
+    "number": "112gdfdbvfddgfg"
 }
 
 ### Change a note
-PUT http://localhost:3001/api/persons/66a0df015f64ce9f3e24681d
+PUT http://localhost:3001/api/persons/66a0dcda341a3766f85415a3
 Content-Type: application/json
 
 
 {
+    "name": "hi",
     "number": "06184159480"
 }
 
